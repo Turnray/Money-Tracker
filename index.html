@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบันทึกรายรับรายจ่าย - Income & Expense Tracker</title>
-a
+    <title>Money Tracker 💵💶💷</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -58,7 +57,7 @@ a
                     <i class="fa-solid fa-wallet text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold text-slate-900 leading-tight">Smart Tracker</h1>
+                    <h1 class="text-lg font-bold text-slate-900 leading-tight">Money Tracker</h1>
                     <p class="text-xs text-slate-500">ระบบบันทึกรายรับรายจ่าย</p>
                 </div>
             </div>
@@ -67,7 +66,7 @@ a
             <div class="flex items-center space-x-3">
                 <div id="connectionStatusBadge" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
                     <span class="w-2 h-2 rounded-full bg-amber-500 mr-1.5 animate-pulse"></span>
-                    <span id="statusText">Demo Mode</span>
+                    <span id="statusText">ยังไม่ได้เชื่อมต่อ Google Script</span>
                 </div>
                 <button id="btnOpenCategoryManager" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-semibold" title="จัดการหมวดหมู่">
                     <i class="fa-solid fa-tags text-sky-600"></i>
@@ -76,9 +75,6 @@ a
                 <button id="btnExportCSV" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-semibold" title="ส่งออกข้อมูลเป็น CSV">
                     <i class="fa-solid fa-file-csv text-emerald-600"></i>
                     <span class="hidden sm:inline">Export</span>
-                </button>
-                <button id="btnOpenSettings" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors" title="ตั้งค่าการเชื่อมต่อ API">
-                    <i class="fa-solid fa-gear text-lg"></i>
                 </button>
             </div>
         </div>
@@ -335,38 +331,6 @@ a
 
     </main>
 
-    <!-- Modal: API Settings -->
-    <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-sky-600"></i> ตั้งค่าการเชื่อมต่อ Google Apps Script
-                </h3>
-                <button class="btnCloseModal text-slate-400 hover:text-slate-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <p class="text-xs text-slate-600 leading-relaxed">
-                นำ **Web App URL** ที่ได้จากการ Deploy Google Apps Script ใน Phase 3 มาวางที่นี่ เพื่อให้หน้าเว็บเชื่อมต่อและบันทึกลง Google Sheets จริง
-            </p>
-
-            <div>
-                <label for="apiUrlInput" class="block text-xs font-semibold text-slate-700 mb-1">Google Apps Script Web App URL</label>
-                <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none">
-            </div>
-
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 space-y-1">
-                <p class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i> คำแนะนำเพิ่มเติม:</p>
-                <p>• หากเว้นว่างไว้ ระบบจะทำงานใน <strong>Demo Mode</strong> ด้วยข้อมูลจำลอง</p>
-                <p>• URL ต้องลงท้ายด้วย <code>/exec</code> เท่านั้น</p>
-            </div>
-
-            <div class="flex items-center justify-end space-x-2 pt-2">
-                <button type="button" class="btnCloseModal px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">ยกเลิก</button>
-                <button type="button" id="btnSaveApiUrl" class="px-4 py-2 text-xs font-semibold bg-sky-600 text-white hover:bg-sky-700 rounded-xl shadow-sm">บันทึกการตั้งค่า</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal: View Receipt Image -->
     <div id="receiptModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-4 shadow-2xl relative">
@@ -454,8 +418,12 @@ a
         /* ==========================================================================
            Application State & Config
            ========================================================================== */
+        // ตั้งค่า Google Apps Script Web App URL ตรงนี้เพียงจุดเดียว
+        // ให้นำ URL ที่ได้จาก Deploy มาแทนข้อความตัวอย่าง และต้องลงท้ายด้วย /exec
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzAEvYiENrRodQmBE6u-NguA7-xdQWYHhg-fuZAKJKwybc4UHJbMxrsAqVb0cOrj7d5YA/exec';
+
         const STATE = {
-            apiUrl: localStorage.getItem('gas_api_url') || '',
+            apiUrl: GAS_API_URL,
             monthlyBudget: parseFloat(localStorage.getItem('monthly_budget')) || 0,
             categories: [],
             transactions: [],
@@ -467,23 +435,6 @@ a
             currentReceiptFileName: '',
             deletingTransactionId: null
         };
-
-        // Fallback Mock Categories for Demo Mode
-        const MOCK_CATEGORIES = [
-            { category_id: 'CAT-INC-01', type: 'income', category_name: 'เงินเดือน', color_code: '#10B981', icon: 'briefcase' },
-            { category_id: 'CAT-INC-02', type: 'income', category_name: 'รายได้เสริม', color_code: '#06B6D4', icon: 'laptop' },
-            { category_id: 'CAT-EXP-01', type: 'expense', category_name: 'อาหารและเครื่องดื่ม', color_code: '#EF4444', icon: 'utensils' },
-            { category_id: 'CAT-EXP-02', type: 'expense', category_name: 'การเดินทาง / ค่าน้ำมัน', color_code: '#F97316', icon: 'car' },
-            { category_id: 'CAT-EXP-03', type: 'expense', category_name: 'ช้อปปิ้ง / ของใช้', color_code: '#EC4899', icon: 'shopping-bag' },
-            { category_id: 'CAT-EXP-04', type: 'expense', category_name: 'สาธารณูปโภค (น้ำ/ไฟ/เน็ต)', color_code: '#3B82F6', icon: 'home' }
-        ];
-
-        // Fallback Mock Transactions for Demo Mode
-        const MOCK_TRANSACTIONS = [
-            { transaction_id: 'TXN-001', date: getTodayString(), type: 'expense', category: 'อาหารและเครื่องดื่ม', amount: 150, note: 'มื้อเที่ยง', receipt_url: '', status: 'active' },
-            { transaction_id: 'TXN-002', date: getTodayString(), type: 'income', category: 'รายได้เสริม', amount: 2500, note: 'รับจ้างทำเว็บ', receipt_url: '', status: 'active' },
-            { transaction_id: 'TXN-003', date: '2026-10-01', type: 'expense', category: 'การเดินทาง / ค่าน้ำมัน', amount: 800, note: 'เติมน้ำมันปตท.', receipt_url: '', status: 'active' }
-        ];
 
         let categoryChartInstance = null;
         let trendChartInstance = null;
@@ -517,45 +468,49 @@ a
             const text = document.getElementById('statusText');
             if (STATE.apiUrl && STATE.apiUrl.trim() !== '') {
                 badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200";
-                text.textContent = "Google Sheets Connected";
+                text.textContent = "เชื่อมต่อ Google Apps Script";
             } else {
-                badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200";
-                text.textContent = "Demo Mode (ข้อมูลจำลอง)";
+                badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-800 border border-rose-200";
+                text.textContent = "ยังไม่ได้เชื่อมต่อ Google Script";
             }
         }
 
+        function ensureApiConfigured() {
+            if (STATE.apiUrl && STATE.apiUrl.startsWith('https://script.google.com/macros/s/') && STATE.apiUrl.endsWith('/exec')) return true;
+            showToast("กรุณาใส่ Google Apps Script Web App URL ในตัวแปร GAS_API_URL ในโค้ดก่อนใช้งาน", "error");
+            return false;
+        }
+
         async function loadInitialData() {
-            showLoading(true, "กำลังโหลดข้อมูล...");
-            
-            if (!STATE.apiUrl) {
-                // Use Mock Data in Demo Mode
-                STATE.categories = MOCK_CATEGORIES;
-                STATE.transactions = MOCK_TRANSACTIONS;
+            if (!ensureApiConfigured()) {
+                STATE.categories = [];
+                STATE.transactions = [];
                 populateCategoryDropdown();
                 applyFiltersAndRender();
-                showLoading(false);
+                updateConnectionBadge();
                 return;
             }
 
+            showLoading(true, "กำลังโหลดข้อมูลจาก Google Sheets...");
             try {
                 const response = await fetch(`${STATE.apiUrl}?action=getInitialData`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const result = await response.json();
+                if (result.status !== 'success') throw new Error(result.message || "โหลดข้อมูลไม่สำเร็จ");
 
-                if (result.status === 'success') {
-                    STATE.categories = result.data.categories || MOCK_CATEGORIES;
-                    STATE.transactions = result.data.transactions || [];
-                    showToast("ดึงข้อมูลสำเร็จ", "success");
-                } else {
-                    throw new Error(result.message || "Failed to fetch data");
-                }
-            } catch (error) {
-                console.warn("API Fetch error, falling back to mock mode:", error);
-                showToast("ไม่สามารถเชื่อมต่อ API ได้ นำเข้าข้อมูล Demo", "warning");
-                STATE.categories = MOCK_CATEGORIES;
-                STATE.transactions = MOCK_TRANSACTIONS;
-            } finally {
+                STATE.categories = result.data?.categories || [];
+                STATE.transactions = result.data?.transactions || [];
                 populateCategoryDropdown();
                 applyFiltersAndRender();
+                updateConnectionBadge();
+            } catch (error) {
+                STATE.categories = [];
+                STATE.transactions = [];
+                populateCategoryDropdown();
+                applyFiltersAndRender();
+                showToast("เชื่อมต่อ Google Apps Script ไม่สำเร็จ: " + error.message, "error");
+                console.error("Google Apps Script API error:", error);
+            } finally {
                 showLoading(false);
             }
         }
@@ -594,23 +549,8 @@ a
 
             showLoading(true, "กำลังบันทึกข้อมูล...");
 
-            if (!STATE.apiUrl) {
-                // Local Demo Mode Add
-                const newTxn = {
-                    transaction_id: 'TXN-' + Date.now(),
-                    date,
-                    type,
-                    category,
-                    amount,
-                    note,
-                    receipt_url: STATE.currentReceiptBase64 || '',
-                    status: 'active'
-                };
-                STATE.transactions.unshift(newTxn);
-                resetForm();
-                applyFiltersAndRender();
+            if (!ensureApiConfigured()) {
                 showLoading(false);
-                showToast("บันทึกข้อมูลเรียบร้อย (Demo Mode)", "success");
                 return;
             }
 
@@ -643,11 +583,8 @@ a
             closeModal('deleteModal');
             showLoading(true, "กำลังลบรายการ...");
 
-            if (!STATE.apiUrl) {
-                STATE.transactions = STATE.transactions.filter(t => t.transaction_id !== txnId);
-                applyFiltersAndRender();
+            if (!ensureApiConfigured()) {
                 showLoading(false);
-                showToast("ลบรายการสำเร็จ (Demo Mode)", "success");
                 return;
             }
 
@@ -885,20 +822,8 @@ a
 
             showLoading(true, "กำลังเพิ่มหมวดหมู่...");
 
-            if (!STATE.apiUrl) {
-                const newCat = {
-                    category_id: 'CAT-' + Date.now(),
-                    type,
-                    category_name: name,
-                    color_code: color,
-                    icon: 'tag'
-                };
-                STATE.categories.push(newCat);
-                document.getElementById('newCatName').value = '';
-                populateCategoryDropdown();
-                renderCategoryListInModal();
+            if (!ensureApiConfigured()) {
                 showLoading(false);
-                showToast("เพิ่มหมวดหมู่ใหม่เรียบร้อย (Demo Mode)", "success");
                 return;
             }
 
@@ -930,12 +855,8 @@ a
         async function handleDeleteCategory(catId) {
             showLoading(true, "กำลังลบหมวดหมู่...");
 
-            if (!STATE.apiUrl) {
-                STATE.categories = STATE.categories.filter(c => c.category_id !== catId);
-                populateCategoryDropdown();
-                renderCategoryListInModal();
+            if (!ensureApiConfigured()) {
                 showLoading(false);
-                showToast("ลบหมวดหมู่เรียบร้อย (Demo Mode)", "success");
                 return;
             }
 
@@ -1044,24 +965,9 @@ a
             document.getElementById('tableSearch').addEventListener('input', applyFiltersAndRender);
             document.getElementById('tableTypeFilter').addEventListener('change', applyFiltersAndRender);
 
-            // Modals Logic
-            document.getElementById('btnOpenSettings').addEventListener('click', () => {
-                document.getElementById('apiUrlInput').value = STATE.apiUrl;
-                openModal('settingsModal');
-            });
-
-            document.getElementById('btnSaveApiUrl').addEventListener('click', () => {
-                const url = document.getElementById('apiUrlInput').value.trim();
-                STATE.apiUrl = url;
-                localStorage.setItem('gas_api_url', url);
-                updateConnectionBadge();
-                closeModal('settingsModal');
-                loadInitialData();
-            });
-
+            // Modal events (ไม่มีหน้าตั้งค่า API บนเว็บไซต์แล้ว)
             document.querySelectorAll('.btnCloseModal').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    closeModal('settingsModal');
                     closeModal('receiptModal');
                     closeModal('deleteModal');
                     closeModal('categoryModal');
